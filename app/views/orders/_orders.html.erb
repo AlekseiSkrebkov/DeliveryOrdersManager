@@ -1,0 +1,23 @@
+
+  <% orders.each do |order|
+        address = order.address
+        client = order.client
+  %>
+      <tr>
+        <%
+           order_load = order.load
+           delivery_shift = order.desired_shift
+        %>
+        <td><%= radio_button_tag(order.id, Load::MORNING_LOAD, (!order_load.nil? && (order_load.delivery_shift == Load::MORNING_LOAD)), disabled: !delivery_shift.nil?) %></td>
+        <td><%= radio_button_tag(order.id, Load::AFTERNOON_LOAD, (!order_load.nil? && (order_load.delivery_shift == Load::AFTERNOON_LOAD)), disabled: !delivery_shift.nil?)%></td>
+        <td><%= radio_button_tag(order.id, Load::EVENING_LOAD, (!order_load.nil? && (order_load.delivery_shift == Load::EVENING_LOAD)), disabled: !delivery_shift.nil?) %></td>
+        <td><%= address.state %></td>
+        <td><%= address.city %></td>
+        <td><%= address.raw_line %></td>
+        <td><%= order.volume %></td>
+        <td><%= client.name %></td>
+        <td><%= client.phone %></td>
+        <td><%= order.order_type %></td>
+      </tr>
+  <% end %>
+

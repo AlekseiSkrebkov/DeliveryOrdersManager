@@ -1,0 +1,95 @@
+<style>
+    header {
+        background-color:aliceblue;
+        color:darkblue;
+        text-align:center;
+        padding:5px;
+    }
+    nav {
+        line-height:30px;
+        background-color:#eeeeee;
+        height:100%;
+        width:200px;
+        float:left;
+        padding:5px;
+    }
+    section {
+        width:1500px;
+        float:left;
+        padding:10px;
+    }
+</style>
+
+
+<header>
+  <h1>
+    Delivery Loads Manager
+  </h1>
+</header>
+
+<nav>
+  <h3>Load orders:</h3>
+  <%= form_tag({action: :upload_orders}, multipart: true) do %>
+      <%= file_field_tag('orders') %>
+        <%= submit_tag("Upload") %>
+  <% end %>
+
+
+  <h3>Select date:</h3>
+  <ul>
+    <% @order_dates.each do |order| %>
+        <li><%= link_to order.desired_date.to_s, orders_path(selected_date: order.desired_date) %></li>
+    <% end %>
+  </ul>
+</nav>
+
+
+<section>
+  <%
+     m_load = @morning_load.get_available_volume
+     n_load = @afternoon_load.get_available_volume
+     e_load = @evening_load.get_available_volume
+  %>
+  <h3>Available volume in Loads</h3>
+  <table>
+    <tr>
+      <th><%= @morning_load.name %></th>
+      <th><%= @afternoon_load.name %></th>
+      <th><%= @evening_load.name %></th>
+    </tr>
+    <tr>
+      <td style="background-color: <%= m_load < 0 ? "crimson" : "green"%>" ><%= m_load %></td>
+      <td><%= n_load %></td>
+      <td><%= e_load %></td>
+    </tr>
+  </table>
+</section>
+<section>
+  <% if (!@order_without_desired_shift.nil? && !@order_with_desired_shift.nil?) %>
+      <h3>Orders haven't been loaded</h3>
+  <% else %>
+      <%= form_tag ({action: :set_load}) do %>
+
+          <%= submit_tag("Save Loads Distribution") %>
+          <%= hidden_field_tag(:delivery_date, @selected_date) %>
+
+          <table>
+            <tr>
+              <th>M</th>
+              <th>N</th>
+              <th>E</th>
+              <th>State</th>
+              <th>City</th>
+              <th>Address</th>
+              <th>Volume</th>
+              <th>Client Name</th>
+              <th>Client Phone</th>
+              <th>Type</th>
+            </tr>
+            <%= render partial: "orders", locals: {orders: @orders_without_desired_shift} %>
+            <%= render partial: "orders", locals: {orders: @orders_with_desired_shift} %>
+
+          </table>
+      <% end %>
+  <% end %>
+</section>

@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  delivery_date: MyString
+  date: MyString
+  delivery_shift: MyString
+  string: MyString
+  name: MyString
+  string: MyString
+
+two:
+  delivery_date: MyString
+  date: MyString
+  delivery_shift: MyString
+  string: MyString
+  name: MyString
+  string: MyString

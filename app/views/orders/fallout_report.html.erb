@@ -1,0 +1,13 @@
+<table>
+  <th>
+    <td>CSV data</td>
+    <td>Error Message</td>
+  </th>
+  <% @failed_rows.each do |key, value| %>
+      <tr>
+        <td>key</td>
+        <td>value</td>
+      </tr>
+  <% end %>
+  <%= link_to orders_path %>
+</table>
