@@ -2,7 +2,9 @@ Rails.application.routes.draw do
   root 'orders#index'
   post 'orders/upload_orders' => 'orders#upload_orders'
   post 'orders/set_load' => 'orders#set_load'
+  post 'loads/:id/set_route' => 'loads#set_route'
   resources :orders
+  resources :loads
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

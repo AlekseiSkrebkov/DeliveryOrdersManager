@@ -9,6 +9,6 @@ class Address < ActiveRecord::Base
   end
 
   def full_address
-    raw_line + ' ' + city.name + ' ' + city.state.name + ' ' + zipcode + ' ' + city.state.country.name
+    raw_line + ', ' + city + ', ' + state + ', ' + zipcode.to_s + ', ' + country
   end
 end

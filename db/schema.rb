@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151027051113) do
+ActiveRecord::Schema.define(version: 20151101132809) do
 
   create_table "addresses", force: true do |t|
     t.string   "raw_line",   null: false
@@ -58,6 +58,7 @@ ActiveRecord::Schema.define(version: 20151027051113) do
     t.integer  "load_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "stop_num"
   end
 
   add_index "orders", ["address_id"], name: "index_orders_on_address_id"

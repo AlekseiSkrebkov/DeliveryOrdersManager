@@ -31,8 +31,10 @@ class OrdersController < ApplicationController
 
       #Retrieve Orders by Load
 
-       @orders_with_desired_shift = Order.where("desired_date = ? and desired_shift is not null", @selected_date)
-       @orders_without_desired_shift = Order.where("desired_date = ? and desired_shift is null", @selected_date)
+      @unassigned_orders = Order.joins(:address).where("desired_date = ? and load_id is null", @selected_date).order("addresses.state, addresses.city")
+      @morning_orders = Order.joins(:address).where(orders: {desired_date: @selected_date, load_id: @morning_load}).order("addresses.state, addresses.city")
+      @afternoon_orders = Order.joins(:address).where(orders: {desired_date: @selected_date, load_id: @afternoon_load}).order("addresses.state, addresses.city")
+      @evening_orders = Order.joins(:address).where(orders: {desired_date: @selected_date, load_id: @evening_load}).order("addresses.state, addresses.city")
     end
 
   end
@@ -84,6 +86,10 @@ class OrdersController < ApplicationController
     else
       redirect_to orders_path
     end
+  end
+
+  def set_sequence_of_stops
+
   end
 
   def fallout_report

@@ -27,4 +27,20 @@ class Load < ActiveRecord::Base
     return available_volume
   end
 
+  def get_orders
+    Order.where(load: self).order(:stop_num)
+  end
+
+  def self.get_morning_load_for_date(date)
+    Load.find_by(delivery_date: date, delivery_shift: MORNING_LOAD)
+  end
+
+  def self.get_afternoon_load_for_date(date)
+    Load.find_by(delivery_date: date, delivery_shift: AFTERNOON_LOAD)
+  end
+
+  def self.get_evening_load_for_date(date)
+    Load.find_by(delivery_date: date, delivery_shift: EVENING_LOAD)
+  end
+
 end
