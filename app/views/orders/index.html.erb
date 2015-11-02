@@ -7,9 +7,11 @@
             <%= submit_tag("Upload", class: "form-control") %>
         </div>
     <% end %>
-
+    <p>
+      <%= link_to "New Delivery Order", new_order_path(date: @selected_date), class: "btn btn-success" %>
+    </p>
     <h3>Select date:</h3>
-    <div class="list-group">
+    <div class="list-group" align="center">
       <% @order_dates.each do |order| %>
           <%= link_to order.desired_date.to_s, orders_path(selected_date: order.desired_date), class: (order.desired_date.to_s == @selected_date ? "list-group-item active" : "list-group-item") %>
       <% end %>
@@ -45,7 +47,7 @@
                   <th>M</th>
                   <th>N</th>
                   <th>E</th>
-                  <th>State</th>
+                  <th>Action</th>
                   <th>City</th>
                   <th>Address</th>
                   <th>Volume</th>

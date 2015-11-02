@@ -11,7 +11,12 @@
         <td><%= radio_button_tag(order.id, Load::MORNING_LOAD, (!order_load.nil? && (order_load.delivery_shift == Load::MORNING_LOAD)), disabled: !delivery_shift.nil?) %></td>
         <td><%= radio_button_tag(order.id, Load::AFTERNOON_LOAD, (!order_load.nil? && (order_load.delivery_shift == Load::AFTERNOON_LOAD)), disabled: !delivery_shift.nil?)%></td>
         <td><%= radio_button_tag(order.id, Load::EVENING_LOAD, (!order_load.nil? && (order_load.delivery_shift == Load::EVENING_LOAD)), disabled: !delivery_shift.nil?) %></td>
-        <td><%= address.state %></td>
+        <td>
+          <div align="center">
+            <%= link_to "<span class=\"glyphicon glyphicon-edit\"></span>".html_safe, edit_order_path(order) %>
+            <%= link_to "<span class=\"glyphicon glyphicon-remove\"></span>".html_safe, order_path(order), method: :delete, date: {confirm: 'Are you sure?'} %>
+          </div>
+        </td>
         <td><%= address.city %></td>
         <td><%= address.raw_line %></td>
         <td><%= order.volume %></td>

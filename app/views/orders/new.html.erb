@@ -1,0 +1,10 @@
+<h3>Create Delivery Order:</h3>
+<%= form_tag({action: :create}, role: "form", class: "form-horizontal") do %>
+
+    <%= render partial: 'order_form', locals: {order: @order} %>
+
+    <div class="col-sm-5" align="center">
+      <%= submit_tag "Create", class: "btn btn-success" %>
+      <%= link_to "Back", orders_path(selected_date: @order.desired_date), class: "btn btn-default" %>
+    </div>
+<% end %>

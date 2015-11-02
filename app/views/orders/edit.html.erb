@@ -1,0 +1,10 @@
+<h3>Edit Delivery Drder:</h3>
+<%= form_tag({action: :update}, method: :patch, role: "form", class: "form-horizontal") do %>
+
+    <%= render partial: 'order_form', locals: {order: @order} %>
+
+    <div class="col-sm-5" align="center">
+      <%= submit_tag "Save", class: "btn btn-success" %>
+      <%= link_to "Back", orders_path(selected_date: @order.desired_date), class: "btn btn-default" %>
+    </div>
+<% end %>

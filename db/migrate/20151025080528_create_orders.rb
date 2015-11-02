@@ -7,7 +7,7 @@ class CreateOrders < ActiveRecord::Migration
       t.string :purchase_order_number
       t.references :client, index: true
       t.references :address, index: true
-      t.string :mode, :null => false, :default => 'TRUCKLOA'
+      t.string :mode, :null => false, :default => 'TRUCKLOAD  '
       t.float :volume, :null => false
       t.integer :unit_quantity
       t.string :unit_type

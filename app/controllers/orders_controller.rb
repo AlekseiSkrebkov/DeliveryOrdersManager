@@ -15,7 +15,7 @@ class OrdersController < ApplicationController
     #if date was not selected by User then orders for the nearest date are displayed
     if @selected_date.nil?
       if @order_dates.size > 0
-        temp = @order_dates[0]
+        temp = @order_dates[1]
         @selected_date = temp.desired_date
       end
     end
@@ -37,6 +37,46 @@ class OrdersController < ApplicationController
       @evening_orders = Order.joins(:address).where(orders: {desired_date: @selected_date, load_id: @evening_load}).order("addresses.state, addresses.city")
     end
 
+  end
+
+  def new
+    @order = Order.new
+    @order.desired_date = params[:date]
+    @addresses = Address.all.order(:raw_line)
+    @clients = Client.all.order(:name)
+  end
+
+  def create
+    order = Order.new
+    desired_date = params[:desired_date]
+    desired_shift = params[:desired_shift]
+    order_type = params[:order_type]
+    purchase_order_number = params[:purchase_order_number]
+    client = params[:client]
+    address = params[:address]
+    mode = params[:mode]
+    volume = params[:volume]
+    unit_quantity = params[:unit_quantity]
+    unit_type = params[:unit_type]
+    Order.create_order_with_loads(desired_date, desired_shift, order_type, purchase_order_number, Client.find(client), Address.find(address), mode, volume, unit_quantity, unit_type)
+    redirect_to orders_path(selected_date: desired_date)
+  end
+
+  def edit
+    @order = Order.find(params[:id])
+    @addresses = Address.all.order(:raw_line)
+    @clients = Client.all.order(:name)
+  end
+
+  def update
+    order = Order.find(params[:id])
+    client = Client.find(params[:client])
+    address = Address.find(params[:address])
+    parameters = params.permit(:desired_date, :desired_shift, :order_type, :purchase_order_number, :mode, :volume, :unit_quantity, :unit_type)
+    parameters[:client] = client
+    parameters[:address] = address
+    order.update(parameters)
+    redirect_to orders_path(selected_date:order.desired_date)
   end
 
   def set_load
@@ -88,9 +128,6 @@ class OrdersController < ApplicationController
     end
   end
 
-  def set_sequence_of_stops
-
-  end
 
   def fallout_report
 
@@ -135,12 +172,8 @@ class OrdersController < ApplicationController
   end
 
 private
-  def default_assignment_to_load(load_label, load)
-    orders = Order.where("delivery_shift = ? and load_id is null", load_label)
-    orders.each do |order|
-      order.update(load: load)
-    end
-  end
+  def read_order_form(params)
 
+  end
 
 end
