@@ -5,23 +5,24 @@
   %>
       <tr>
         <%
-           order_load = order.load
-           delivery_shift = order.desired_shift
+           delivery_shift = order.load.nil? ? nil : order.load.delivery_shift
         %>
-        <td><%= radio_button_tag(order.id, Load::MORNING_LOAD, (!order_load.nil? && (order_load.delivery_shift == Load::MORNING_LOAD)), disabled: !delivery_shift.nil?) %></td>
-        <td><%= radio_button_tag(order.id, Load::AFTERNOON_LOAD, (!order_load.nil? && (order_load.delivery_shift == Load::AFTERNOON_LOAD)), disabled: !delivery_shift.nil?)%></td>
-        <td><%= radio_button_tag(order.id, Load::EVENING_LOAD, (!order_load.nil? && (order_load.delivery_shift == Load::EVENING_LOAD)), disabled: !delivery_shift.nil?) %></td>
+          <td><%= radio_button_tag(order.id, Load::MORNING_LOAD, (Load::MORNING_LOAD == delivery_shift) ) %></td>
+          <td><%= radio_button_tag(order.id, Load::AFTERNOON_LOAD, (Load::AFTERNOON_LOAD == delivery_shift) ) %></td>
+          <td><%= radio_button_tag(order.id, Load::EVENING_LOAD, (Load::EVENING_LOAD == delivery_shift) ) %></td>
         <td>
           <div align="center">
             <%= link_to "<span class=\"glyphicon glyphicon-edit\"></span>".html_safe, edit_order_path(order) %>
             <%= link_to "<span class=\"glyphicon glyphicon-remove\"></span>".html_safe, order_path(order), method: :delete, date: {confirm: 'Are you sure?'} %>
           </div>
         </td>
+        <td><%= order.id %></td>
+        <td><%= order.desired_shift %></td>
         <td><%= address.city %></td>
         <td><%= address.raw_line %></td>
-        <td><%= order.volume %></td>
-        <td><%= client.name %></td>
-        <td><%= client.phone %></td>
+        <td><%= order.purchase_order_number %></td>
+        <td><span data-toggle="tooltip" data-placement="bottom" title="<%= order.cargo_description %>"><%= order.volume %></span></td>
+        <td><span data-toggle="tooltip" data-placement="bottom" title="<%= client.phone %>"><%= client.name %></span></td>
         <td><%= order.order_type %></td>
       </tr>
   <% end %>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151101132809) do
+ActiveRecord::Schema.define(version: 20151104054438) do
 
   create_table "addresses", force: true do |t|
     t.string   "raw_line",   null: false
@@ -40,9 +40,11 @@ ActiveRecord::Schema.define(version: 20151101132809) do
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "user_id"
   end
 
   add_index "loads", ["delivery_date", "delivery_shift"], name: "index_loads_on_delivery_date_and_delivery_shift"
+  add_index "loads", ["user_id"], name: "index_loads_on_user_id"
 
   create_table "orders", force: true do |t|
     t.date     "desired_date"
@@ -64,5 +66,12 @@ ActiveRecord::Schema.define(version: 20151101132809) do
   add_index "orders", ["address_id"], name: "index_orders_on_address_id"
   add_index "orders", ["client_id"], name: "index_orders_on_client_id"
   add_index "orders", ["load_id"], name: "index_orders_on_load_id"
+
+  create_table "users", force: true do |t|
+    t.string   "login"
+    t.string   "password"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end

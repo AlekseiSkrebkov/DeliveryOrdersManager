@@ -4,7 +4,7 @@ class Order < ActiveRecord::Base
   belongs_to :address
   belongs_to :load
 
-  def Order.create_order_with_loads(desired_date, desired_shift, order_type, purchase_order_number, client, address, mode, volume, unit_quantity, unit_type)
+  def self.create_order_with_loads(desired_date, desired_shift, order_type, purchase_order_number, client, address, mode, volume, unit_quantity, unit_type)
     order = Order.new
     order.desired_date = desired_date
     order.desired_shift= desired_shift
@@ -23,12 +23,11 @@ class Order < ActiveRecord::Base
       loads = Load.get_loads_for_date(desired_date)
     end
 
-    if !desired_shift.nil?
-      puts "Desired shift for Order id=" + order.purchase_order_number.to_s + loads[desired_shift].to_s
-      order.load = loads[desired_shift]
-    end
-
     order.save
+  end
+
+  def cargo_description
+    ActionController::Base.helpers.pluralize(self.unit_quantity, self.unit_type)
   end
 
 end

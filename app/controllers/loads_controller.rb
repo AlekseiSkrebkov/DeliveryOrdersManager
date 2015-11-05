@@ -1,32 +1,40 @@
 class LoadsController < ApplicationController
 
   def index
-    @selected_date = params[:selected_date]
-    if @selected_date.nil?
-      @selected_date = Load.find_by(delivery_date: @selected_date).delivery_date
+    #ToDo Add filter by status and driver
+    @load_dates = Load.select(:delivery_date).order(:delivery_date).distinct
+
+    @date = params[:date]
+    if (@date.nil? || @date.size ==0)
+      @date = @load_dates[0].delivery_date.to_s
     end
-    @other_dates = Load.select(:delivery_date).where("delivery_date <> ?", @selected_date).distinct
 
-    @morning_load = Load.get_morning_load_for_date(@selected_date)
-    @afternoon_load = Load.get_afternoon_load_for_date(@selected_date)
-    @evening_load = Load.get_evening_load_for_date(@selected_date)
+    driver_id = params[:driver]
+    @driver = nil
+    if !driver_id.nil?
+      @driver = User.find(driver_id)
+    end
 
-    @morning_orders = @morning_load.get_orders
-    @afternoon_orders = @afternoon_load.get_orders
-    @evening_orders = @evening_load.get_orders
+    loads_by_driver = Load.where(user: @driver, delivery_date: @date)
 
+    @orders_by_load = Hash.new
+    loads_by_driver.each do |load|
+      @orders_by_load[load] = Order.where(load: load).order(:stop_num)
+    end
+
+    respond_to do |format|
+      format.html
+      format.csv {
+        send_data to_csv(@orders_by_load), filename: "Routing list for " + @date + ".csv"
+        #redirect_to load_path(@load)
+      }
+    end
   end
 
   def show
     @load = Load.find(params[:id])
     @orders = Order.where(load: @load)
-    respond_to do |format|
-      format.html
-      format.csv {
-        send_data self.to_csv(@load, @orders)
-        #redirect_to load_path(@load)
-      }
-    end
+
   end
 
   def edit
@@ -62,14 +70,17 @@ class LoadsController < ApplicationController
   end
 
 private
-  def to_csv(load, orders)
+  def to_csv(orders_by_load)
     require 'csv'
     CSV.generate do |csv|
-      csv << ['Date and shift', 'Stop #', 'Address', 'Purchase Order#', 'Description','Contact Phone#']
-      orders.each do |order|
-        csv << [load.name, order.stop_num.to_s, order.address.full_address, order.purchase_order_number, order.unit_quantity.to_s + order.unit_type, order.client.phone]
+      csv << ['Date/Time', 'Stop #', 'Address', 'Purchase Order#', 'Description','Client Name', 'Client Phone#']
+      orders_by_load.each do |load, orders|
+        orders.each do |order|
+          csv << [load.delivery_date.to_s + ' ' + load.name, order.stop_num.to_s, order.address.full_address, order.purchase_order_number, order.cargo_description, order.client.name, order.client.phone]
+        end
       end
     end
+
   end
 
 end

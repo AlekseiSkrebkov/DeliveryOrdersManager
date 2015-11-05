@@ -1,0 +1,40 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4><%= load.name %>:</h4>
+  </div>
+  <div class="panel-body">
+      <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>City</th>
+        <th>Address</th>
+        <th>Purchase Order</th>
+        <th>Volume</th>
+        <th>Units</th>
+        <th>Client Name</th>
+        <th>Order Type</th>
+      </tr>
+      </thead>
+      <tbody>
+        <%if orders.count == 0 %>
+            <td colspan="8"><b>no orders</b></td>
+        <% else %>
+            <% orders.each do |order|
+              address = order.address
+              client = order.client
+            %>
+              <tr>
+                <td><%= address.city %></td>
+                <td><%= address.raw_line %></td>
+                <td><%= order.purchase_order_number %></td>
+                <td><%= order.volume %></td>
+                <td><%= order.cargo_description %></td>
+                <td><%= client.name %></td>
+                <td><%= order.order_type %></td>
+              </tr>
+            <% end %>
+          <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

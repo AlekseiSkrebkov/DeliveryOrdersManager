@@ -7,20 +7,18 @@ class OrdersController < ApplicationController
   COMPANY_ZIPCODE = "27603"
 
   def index
-    #Retrieving  dates
+    @errors = session[:errors]
+    session[:errors] = nil
     @order_dates = Order.select(:desired_date).distinct.order("desired_date ASC")
     @selected_date = params[:selected_date]
-    @orders_count = Order.count
     #Retrieving Orders
     #if date was not selected by User then orders for the nearest date are displayed
     if @selected_date.nil?
       if @order_dates.size > 0
-        temp = @order_dates[1]
-        @selected_date = temp.desired_date
+        order = @order_dates[1]
+        @selected_date = order.desired_date.to_s
       end
     end
-
-   # @orders = Array.new
 
     if !@selected_date.nil?
       #Retrieving Loads
@@ -80,32 +78,60 @@ class OrdersController < ApplicationController
   end
 
   def set_load
+    errors = Array.new
+    desired_shift_conflict_orders = Array.new
     date = params[:delivery_date]
-    logger.debug "Date="+date.to_s
-    orders_without_desired_shift = Order.where("desired_date = ? and desired_shift is null", date)
-    logger.debug "Orders count=" + orders_without_desired_shift.count.to_s
-    loads = Load.get_loads_for_date(date)
-    logger.debug loads.count.to_s + " loads selected"
-    orders_without_desired_shift.each do |order|
-      id = order.id.to_s
-      selected_load = params[id].to_s
-      logger.debug "selected load for id=" + id + " is "+ selected_load + selected_load.nil?.to_s
+    orders_by_date = Order.where("desired_date = ?", date)
 
-      #ToDo: refactor
-      if !selected_load.nil? && selected_load.length > 0
-        if order.load.nil?
-          logger.debug "set load="+loads[selected_load].delivery_shift
-          order.update(load: loads[selected_load])
-        else
-          if order.load.delivery_shift != selected_load
-            logger.debug "override load="+loads[selected_load].delivery_shift
-            order.update(load: loads[selected_load])
+    orders_by_delivery_shift = Hash.new
+    orders_by_date.each do |order|
+      delivery_shift = params[order.id.to_s]
+      if (delivery_shift.nil?)
+        next
+      end
+
+      if orders_by_delivery_shift[delivery_shift].nil?
+        orders_by_delivery_shift[delivery_shift] = Array.new
+      end
+      logger.debug "ALSK id=" + order.id.to_s + " load is nil?=" + order.load.nil?.to_s + " load is changed?=" + (!order.load.nil? && (order.load.delivery_shift != delivery_shift)).to_s
+      if !order.desired_shift.nil? && (order.desired_shift != delivery_shift)
+        desired_shift_conflict_orders.push(order.id)
+      elsif (order.load.nil?) || (!order.load.nil? && (order.load.delivery_shift != delivery_shift))
+        orders_by_delivery_shift[delivery_shift].push(order.id)
+      end
+    end
+
+    if (!desired_shift_conflict_orders.empty?)
+      errors.push("Selected delivery time contradicts with the time desired by Client for the following orders: " + desired_shift_conflict_orders.to_s)
+    end
+    logger.debug "ALSK " + orders_by_delivery_shift.to_s
+
+    orders_by_delivery_shift.each do |delivery_shift, orders|
+      if !orders.empty?
+        load = Load.get_by_date_and_load(date, delivery_shift)
+        i=0
+        orders.each do |order_id|
+          order = Order.find(order_id)
+          #logger.debug "ALSK available_volume=" + load.available_volume.to_s + " need volume=" + required_volume.to_s
+          if load.enough_volume?(order.volume)
+            order.update(load: load)
+            i += 1
+          else
+            error_message = "Available volume is not enough to put following orders into load for " + load.name + ": "
+            failed_orders = Array.new
+            while i < orders.size do
+              failed_orders.push(orders[i])
+              i += 1
+            end
+            error_message += failed_orders.to_s
+            errors.push(error_message)
+            break
           end
         end
       end
-
-
     end
+
+    session[:errors] = errors
     redirect_to orders_path("selected_date" => date )
   end
 
@@ -169,11 +195,6 @@ class OrdersController < ApplicationController
     #if result == false
     #  @failed_rows[data] = result
     #end
-  end
-
-private
-  def read_order_form(params)
-
   end
 
 end
