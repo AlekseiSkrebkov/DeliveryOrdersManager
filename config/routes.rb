@@ -2,10 +2,12 @@ Rails.application.routes.draw do
   get 'auth/signin'
 
   root 'auth#signin'
-  post 'auth/auth' => 'auth#auth'
+  post 'auth/signin' => 'auth#signin'
+  get 'auth/signout' => 'auth#signout'
   post 'orders/upload_orders' => 'orders#upload_orders'
   post 'orders/set_load' => 'orders#set_load'
   post 'loads/:id/set_route' => 'loads#set_route'
+  get 'loads/:id/routing' => 'loads#routing', :as => 'load_routing'
   resources :orders
   resources :loads
 

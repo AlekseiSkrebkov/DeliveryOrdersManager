@@ -4,6 +4,9 @@ class Order < ActiveRecord::Base
   belongs_to :address
   belongs_to :load
 
+  ORDER_TYPE_DELIVERY = "Delivery"
+  ORDER_TYPE_RETURN = "Return"
+
   def self.create_order_with_loads(desired_date, desired_shift, order_type, purchase_order_number, client, address, mode, volume, unit_quantity, unit_type)
     order = Order.new
     order.desired_date = desired_date

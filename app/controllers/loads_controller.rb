@@ -22,6 +22,8 @@ class LoadsController < ApplicationController
       @orders_by_load[load] = Order.where(load: load).order(:stop_num)
     end
 
+    logger.debug "orders_by_load=" + @orders_by_load.to_s
+
     respond_to do |format|
       format.html
       format.csv {
@@ -34,43 +36,79 @@ class LoadsController < ApplicationController
   def show
     @load = Load.find(params[:id])
     @orders = Order.where(load: @load)
-
   end
 
-  def edit
+  def routing
+    @errors = session[:errors]
+    session[:errors] = nil
     @load = Load.find(params[:id])
     @date = @load.delivery_date
-
-    @orders = Order.joins(:address).select("address_id, sum(volume) as volume, order_type, stop_num").where(load: @load).group("client_id, order_type").order("state, city, raw_line")
-
+    @stops = @load.stops_set
   end
 
   def set_route
-    @load = Load.find(params[:id])
-    orders_in_load = Order.where(load: @load)
+    load = Load.find(params[:id])
+    orders_in_load = load.orders_sorted_by_type
 
-    logger.debug "order in loads quantity: " + orders_in_load.count.to_s
+    errors = []
+    address_to_stopnum_map = load.address_to_stopnum_map
+    logger.debug "stop_num_to_address_map: " + address_to_stopnum_map.to_s
+
+    duplications = Set.new
 
     orders_in_load.each do |order|
+      order_stop_num = order.stop_num.to_s
       address_id = order.address.id
+      order_type = order.order_type
+      params_key= address_id.to_s + order_type
 
-      logger.debug "processing address_id = " + address_id.to_s
+      specified_stop_num = params[params_key]
 
-      specified_stop_num = params[address_id.to_s]
+      if (order_stop_num == specified_stop_num)
+        next
+      end
 
+      if !specified_stop_num.empty?
+        #Check truck's available capacity for return orders
+        if order.order_type == Order::ORDER_TYPE_RETURN
+          required_volume = order.volume
+          volume_before_return = load.available_volume_by_stop(specified_stop_num)
+          if required_volume > volume_before_return
+            errors.push("There will not enough room in truck to get cargo from " + order.address.raw_line + ", " + order.address.city + " at stop #" + specified_stop_num + ". Available volume at this stop is " + load.available_volume.to_s )
+            next
+          end
+        end
 
-      if !specified_stop_num.nil?
-        logger.debug "specified stop num = " + specified_stop_num
+        logger.debug "specified_stop_num"
+        logger.debug "address_to_stopnum_map.has_value?(specified_stop_num)= " + address_to_stopnum_map.has_value?(specified_stop_num).to_s
+        logger.debug "(address_to_stopnum_map.key(specified_stop_num) != address_id)= " + (address_to_stopnum_map.key(specified_stop_num) != address_id).to_s
+
+        #Checking for duplications
+        if address_to_stopnum_map.has_value?(specified_stop_num) && (address_to_stopnum_map.key(specified_stop_num) != address_id)
+          duplications.add(specified_stop_num)
+          #stop_nums.push(order_stop_num)
+          address_to_stopnum_map[specified_stop_num] = address_id
+          next
+        end
+
+        #stop_nums.push(specified_stop_num)
+        address_to_stopnum_map[specified_stop_num] = address_id
         order.update(stop_num: specified_stop_num)
       end
     end
 
+    if !duplications.empty?
+      errors.push("The following Stop numbers are duplicated: " + duplications.to_a.to_s)
+    end
 
-    redirect_to @load
+    session[:errors] = errors
+    redirect_to load_routing_path
   end
 
 private
   def to_csv(orders_by_load)
+    logger.debug "order_b_load:" + orders_by_load.to_s
+
     require 'csv'
     CSV.generate do |csv|
       csv << ['Date/Time', 'Stop #', 'Address', 'Purchase Order#', 'Description','Client Name', 'Client Phone#']
@@ -80,7 +118,6 @@ private
         end
       end
     end
-
   end
 
 end

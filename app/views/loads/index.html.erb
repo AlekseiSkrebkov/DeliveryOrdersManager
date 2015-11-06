@@ -15,7 +15,7 @@
         <h3> Orders distribution across loads for: <%= @date %> </h3>
       </div>
       <div class="col-sm-4" align="right">
-        <%= link_to 'Download Routing List', loads_path(format: 'csv'), class: "btn btn-info" %>
+        <%= link_to 'Download Routing List', loads_path(date: @date, format: 'csv'), class: "btn btn-info" %>
       </div>
     </div>
 

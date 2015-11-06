@@ -1,8 +1,8 @@
 <%
    orders_exist = (@order_dates.count > 0)
 %>
-<div class="row">
-  <div class="col-sm-2">
+
+<% content_for :navigation do %>
     <p>
       <%= link_to "New Delivery Order", new_order_path(date: @selected_date), class: "btn btn-success" %>
     </p>
@@ -17,83 +17,80 @@
           <%= link_to "Upload Orders", "orders/upload_orders", class: "btn btn-success" %>
         </p>
     <% end %>
-  </div>
-  <div class="col-sm-10">
-    <% if !orders_exist %>
-        <h4>
-          No orders exist in the system
-        </h4>
-        <p>
-          Please upload CSV file containing orders or create new order using "<b>New Delivery Order</b>" button
-        </p>
-        <%= render partial: "upload_orders" %>
-    <% else %>
-        <%
-           m_load = @morning_load.available_volume
-           n_load = @afternoon_load.available_volume
-           e_load = @evening_load.available_volume
-        %>
-
-        <% if !(@errors.nil? || @errors.empty?) %>
-            <%= render "errors", locals: {errors: @errors} %>
-        <% end %>
+<% end %>
 
 
-        <div class="row">
-          <div class="col-sm-8">
-            <table class="table">
-              <thead>
+<% if !orders_exist %>
+    <h4>
+      No orders exist in the system
+    </h4>
+    <p>
+      Please upload CSV file containing orders or create new order using "<b>New Delivery Order</b>" button
+    </p>
+    <%= render partial: "upload_orders" %>
+<% else %>
+    <%
+       m_load = @morning_load.available_volume
+       n_load = @afternoon_load.available_volume
+       e_load = @evening_load.available_volume
+    %>
+
+    <%= render "common/errors", locals: {errors: @errors} %>
+
+
+    <div class="row">
+      <div class="col-sm-8">
+        <table class="table">
+          <thead>
+            <tr>
+                <th>Time frame (<span class="glyphicon glyphicon-info-sign"></span>click to edit route):</th>
+                <th><%= link_to @morning_load.name, load_routing_path(@morning_load) %></th>
+                <th><%= link_to @afternoon_load.name, load_routing_path(@afternoon_load) %></th>
+                <th><%= link_to @evening_load.name, load_routing_path(@evening_load) %></th>
+              </tr>
+          </thead>
+          <tbody>
+            <tr>
+                <th>Available volume:</th>
+                <td><%= m_load %></td>
+                <td><%= n_load %></td>
+                <td><%= e_load %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+      <%= form_tag ({action: :set_load}) do %>
+
+          <%= submit_tag("Save Orders Distribution", class: "btn btn-success") %>
+          <%= hidden_field_tag(:delivery_date, @selected_date) %>
+
+          <table class="table table-hover">
+            <thead>
                 <tr>
-                    <th>Delivery time frame:</th>
-                    <th><%= link_to @morning_load.name, edit_load_path(@morning_load) %></th>
-                    <th><%= link_to @afternoon_load.name, edit_load_path(@afternoon_load) %></th>
-                    <th><%= link_to @evening_load.name, edit_load_path(@evening_load) %></th>
-                  </tr>
-              </thead>
-              <tbody>
-                <tr>
-                    <th>Available volume:</th>
-                    <td><%= m_load %></td>
-                    <td><%= n_load %></td>
-                    <td><%= e_load %></td>
+                  <th>M</th>
+                  <th>N</th>
+                  <th>E</th>
+                  <th>Action</th>
+                  <th>#</th>
+                  <th><span class="glyphicon glyphicon-time" title="Client's desired delivery time frame"></span></th>
+                  <th>City</th>
+                  <th>Address</th>
+                  <th>Purchase Order</th>
+                  <th>Volume</th>
+
+                  <th>Client Name</th>
+                  <th>Type</th>
                 </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-          <%= form_tag ({action: :set_load}) do %>
-
-              <%= submit_tag("Save Orders Distribution", class: "btn btn-success") %>
-              <%= hidden_field_tag(:delivery_date, @selected_date) %>
-
-              <table class="table table-hover">
-                <thead>
-                    <tr>
-                      <th>M</th>
-                      <th>N</th>
-                      <th>E</th>
-                      <th>Action</th>
-                      <th>#</th>
-                      <th><span class="glyphicon glyphicon-time" title="Client's desired delivery time frame"></span></th>
-                      <th>City</th>
-                      <th>Address</th>
-                      <th>Purchase Order</th>
-                      <th>Volume</th>
-
-                      <th>Client Name</th>
-                      <th>Type</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <%= render partial: "orders", locals: {orders: @unassigned_orders} %>
-                    <%= render partial: "orders", locals: {orders: @morning_orders} %>
-                    <%= render partial: "orders", locals: {orders: @afternoon_orders} %>
-                    <%= render partial: "orders", locals: {orders: @evening_orders} %>
-                </tbody>
-              </table>
-          <% end %>
-    <% end %>
-  </div>
-</div>
+            </thead>
+            <tbody>
+                <%= render partial: "orders", locals: {orders: @unassigned_orders} %>
+                <%= render partial: "orders", locals: {orders: @morning_orders} %>
+                <%= render partial: "orders", locals: {orders: @afternoon_orders} %>
+                <%= render partial: "orders", locals: {orders: @evening_orders} %>
+            </tbody>
+          </table>
+      <% end %>
+<% end %>
 

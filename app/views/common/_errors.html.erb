@@ -1,0 +1,14 @@
+<% if !(@errors.nil? || @errors.empty?) %>
+    <div class="alert alert-warning fade in">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+      <h4>Problems occurred:</h4>
+      <ul>
+        <% @errors.each do |error| %>
+            <p>
+            <li><%=error %></li>
+            </p>
+        <% end %>
+      </ul>
+    </div>
+<% end %>
+

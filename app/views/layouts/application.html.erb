@@ -13,9 +13,31 @@
 
     <div class="container">
       <div class="page-header">
-        <h1>Delivery Loads Manager</h1>
+        <div class="row">
+          <div class="col-sm-10">
+            <h1>Delivery Loads Manager</h1>
+          </div>
+          <div class="col-sm-2" align="right">
+            <%
+               user_id = session[:user]
+               if !user_id.nil?
+             %>
+                <span class="glyphicon glyphicon-user">&nbsp<b><%= User.find(user_id).login %></b></span>
+                <br/>
+                <%= link_to 'Log Out &nbsp<span class="glyphicon glyphicon-log-out"></span>'.html_safe, {controller: 'auth', action: 'signout'}, class: 'btn btn-default' %>
+            <% end %>
+          </div>
+        </div>
       </div>
-      <%= yield %>
+      <div class="row">
+        <div class="col-sm-2">
+          <%= yield :navigation %>
+        </div>
+        <div class="col-sm-10">
+          <%= yield %>
+        </div>
+      </div>
+
     </div>
 
 </body>

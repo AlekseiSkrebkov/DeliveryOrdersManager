@@ -1,15 +1,46 @@
 class AuthController < ApplicationController
+
   def signin
-  end
+    @errors = session[:errors]
+    session[:errors] = nil
+    if @errors.nil?
+      @errors = []
+    end
 
-  def auth
+    if params["commit"].nil?
+      return
+    end
+
     login = params[:login]
-    password = params[:password]
+    if login.nil? || login.empty?
+      @errors.push('Login is empty')
+    end
 
-    if login == 'Disp'
+    password = params[:password]
+    if  password.nil? || password.empty?
+      @errors.push('Password is empty')
+    end
+
+    user = User.find_by(login: login, password: password)
+
+    if user.nil?
+      @errors.push("User with specified login and passoword haven't been found")
+      return
+    end
+    logger.debug "user type=" + user.user_type
+
+
+    session[:user] = user.id
+
+    if user.dispatcher?
       redirect_to orders_path
-    elsif login == "Driver"
+    else
       redirect_to loads_path
     end
+  end
+
+  def signout
+    session[:user] = nil
+    redirect_to root_path
   end
 end
