@@ -31,18 +31,9 @@ class Load < ActiveRecord::Base
     }
   end
 
-  def self.create_morning_load(date)
-    Load.create(delivery_date: date, delivery_shift: MORNING_LOAD, name: ("8am - 12am"))
+  def self.exist_for_date? (date)
+    !Load.find_by(delivery_date: date).nil?
   end
-
-  def self.create_afternoon_load(date)
-    Load.create(delivery_date: date, delivery_shift: AFTERNOON_LOAD, name: ("12am - 6pm"))
-  end
-
-  def self.create_evening_load(date)
-    Load.create(delivery_date: date, delivery_shift: EVENING_LOAD, name: ("6pm - 10pm"))
-  end
-
 
   def self.get_by_date_and_load(date, shift)
     load = Load.find_by(delivery_date: date, delivery_shift: shift)
@@ -89,24 +80,13 @@ class Load < ActiveRecord::Base
     Order.joins(:address).select("address_id, sum(volume) as volume, order_type, stop_num").where(load: self).group("address_id, order_type").order("stop_num, state, city, raw_line")
   end
 
-  def orders_sorted_by_stop_num
-    Order.where(load: self).order(:stop_num)
+  def number_of_stops
+    result = Order.joins(:address).select("address_id").where(load: self).group("address_id, order_type")
+    return result.as_json.size
   end
 
   def orders_sorted_by_type
     Order.where(load: self).order("order_type")
-  end
-
-  def self.get_morning_load_for_date(date)
-    Load.find_by(delivery_date: date, delivery_shift: MORNING_LOAD)
-  end
-
-  def self.get_afternoon_load_for_date(date)
-    Load.find_by(delivery_date: date, delivery_shift: AFTERNOON_LOAD)
-  end
-
-  def self.get_evening_load_for_date(date)
-    Load.find_by(delivery_date: date, delivery_shift: EVENING_LOAD)
   end
 
 private

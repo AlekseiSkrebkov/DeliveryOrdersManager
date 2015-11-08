@@ -7,28 +7,31 @@ class AuthController < ApplicationController
       @errors = []
     end
 
-    if params["commit"].nil?
-      return
-    end
 
-    login = params[:login]
-    if login.nil? || login.empty?
-      @errors.push('Login is empty')
-    end
+    if !session[:user].nil?
+      user = User.find(session[:user])
+    else
+      if params["commit"].nil?
+        return
+      end
 
-    password = params[:password]
-    if  password.nil? || password.empty?
-      @errors.push('Password is empty')
-    end
+      login = params[:login]
+      if login.nil? || login.empty?
+        @errors.push('Login is empty')
+      end
 
-    user = User.find_by(login: login, password: password)
+      password = params[:password]
+      if  password.nil? || password.empty?
+        @errors.push('Password is empty')
+      end
+
+      user = User.find_by(login: login, password: password)
+    end
 
     if user.nil?
       @errors.push("User with specified login and passoword haven't been found")
       return
     end
-    logger.debug "user type=" + user.user_type
-
 
     session[:user] = user.id
 

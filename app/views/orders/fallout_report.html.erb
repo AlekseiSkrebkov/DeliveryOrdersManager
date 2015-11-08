@@ -1,13 +1,55 @@
-<table>
-  <th>
-    <td>CSV data</td>
-    <td>Error Message</td>
-  </th>
-  <% @failed_rows.each do |key, value| %>
-      <tr>
-        <td>key</td>
-        <td>value</td>
-      </tr>
+<% content_for :navigation do %>
+    <%= link_to 'Orders Dispatching', orders_path, class: 'btn btn-info' %>
+<% end %>
+
+<div class="alert alert-info">
+  <p>
+    <strong><%=@loaded_orders_quantity%></strong> orders loaded successfully
+  </p>
+  <% if @failed_orders_quantity > 0%>
+      <p>
+        <strong><%=@failed_orders_quantity%></strong> orders haven't been loaded due to the problems described in the table below
+      </p>
   <% end %>
-  <%= link_to orders_path %>
+</div>
+
+<table class="table table-hover">
+  <thead>
+      <tr>
+          <th>Order parameters specified in CSV</th>
+          <th>Errors occurred during order loading</th>
+      </tr>
+  </thead>
+  <tbody>
+      <% @failed_rows.each do |order, errors|%>
+          <tr>
+            <td>
+              <p><b>Desired delivery date: </b> <%=order.desired_date%><br/>
+              <b>Desired delivery shift: </b> <%=order.desired_shift%> <br/>
+              <b>Purchase Order Number: </b><%=order.purchase_order_number%><br/>
+              <b>Client Name: </b><%=order.client.name%><br/>
+              <b>Client Phone: </b><%=order.client.phone%><br/>
+              <b>Destination Country: </b><%=order.address.country%><br/>
+              <b>Destination State:</b> <%=order.address.state%><br/>
+              <b>Destination City: </b><%=order.address.city%><br/>
+              <b>Destination Raw: </b><%=order.address.raw_line%><br/>
+              <b>Destination Zip code: </b><%=order.address.zipcode %><br/>
+              <b>Mode: </b><%=order.mode%><br/>
+              <b>Volume: </b><%=order.volume%><br/>
+              <b>Units Quantity: </b><%=order.unit_quantity%><br/>
+              <b>Units Type: </b><%=order.unit_type%></p>
+            </td>
+            <td>
+              <ul>
+                <% errors.each do |message| %>
+                    <li><%=message%></li>
+                <% end %>
+              </ul>
+            </td>
+          </tr>
+      <% end %>
+  </tbody>
+
 </table>
+
+<%= link_to orders_path %>

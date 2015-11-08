@@ -8,6 +8,8 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <%= javascript_include_tag 'application' %>
+  <%= csrf_meta_tag %>
 </head>
 <body>
 
@@ -24,7 +26,7 @@
              %>
                 <span class="glyphicon glyphicon-user">&nbsp<b><%= User.find(user_id).login %></b></span>
                 <br/>
-                <%= link_to 'Log Out &nbsp<span class="glyphicon glyphicon-log-out"></span>'.html_safe, {controller: 'auth', action: 'signout'}, class: 'btn btn-default' %>
+                <%= link_to 'Sign Out &nbsp<span class="glyphicon glyphicon-log-out"></span>'.html_safe, {controller: 'auth', action: 'signout'}, class: 'btn btn-default' %>
             <% end %>
           </div>
         </div>

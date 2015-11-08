@@ -1,28 +1,16 @@
-<div class="row">
-  <div class="col-sm-2">
+<% content_for :navigation do %>
     <h3>Delivery Dates:</h3>
     <div class="list-group" align="center">
       <% @load_dates.each do |load|
-          delivery_date = load.delivery_date
+        delivery_date = load.delivery_date
       %>
           <%= link_to delivery_date, loads_path(date: delivery_date), class: (delivery_date.to_s == @date ? "list-group-item active" : "list-group-item") %>
       <% end %>
     </div>
-  </div>
-  <div class="col-sm-10">
-    <div class="row">
-      <div class="col-sm-8">
-        <h3> Orders distribution across loads for: <%= @date %> </h3>
-      </div>
-      <div class="col-sm-4" align="right">
-        <%= link_to 'Download Routing List', loads_path(date: @date, format: 'csv'), class: "btn btn-info" %>
-      </div>
-    </div>
+<% end %>
 
-      <% @orders_by_load.each do |load, orders| %>
-          <%= render partial: "load", locals: {load: load, orders: orders} %>
+<h3> Orders distribution across loads on: <%= @date %> </h3>
 
-      <% end %>
-
-  </div>
-</div>
+<% @orders_by_load.each do |load, orders| %>
+  <%= render partial: "load", locals: {load: load, orders: orders} %>
+<% end %>

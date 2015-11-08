@@ -13,9 +13,6 @@
               <%= link_to order.desired_date.to_s, orders_path(selected_date: order.desired_date), class: (order.desired_date.to_s == @selected_date ? "list-group-item active" : "list-group-item") %>
           <% end %>
         </div>
-        <p>
-          <%= link_to "Upload Orders", "orders/upload_orders", class: "btn btn-success" %>
-        </p>
     <% end %>
 <% end %>
 
@@ -29,14 +26,8 @@
     </p>
     <%= render partial: "upload_orders" %>
 <% else %>
-    <%
-       m_load = @morning_load.available_volume
-       n_load = @afternoon_load.available_volume
-       e_load = @evening_load.available_volume
-    %>
 
     <%= render "common/errors", locals: {errors: @errors} %>
-
 
     <div class="row">
       <div class="col-sm-8">
@@ -52,20 +43,24 @@
           <tbody>
             <tr>
                 <th>Available volume:</th>
-                <td><%= m_load %></td>
-                <td><%= n_load %></td>
-                <td><%= e_load %></td>
+                <td><%= @morning_load.available_volume %></td>
+                <td><%= @afternoon_load.available_volume %></td>
+                <td><%= @evening_load.available_volume %></td>
+            </tr>
+            <tr>
+                <th>Number of stops:</th>
+                <td><%= @morning_load.number_of_stops %></td>
+                <td><%= @afternoon_load.number_of_stops %></td>
+                <td><%= @evening_load.number_of_stops %></td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
 
-      <%= form_tag ({action: :set_load}) do %>
-
+    <%= form_tag ({action: :set_load}) do %>
           <%= submit_tag("Save Orders Distribution", class: "btn btn-success") %>
           <%= hidden_field_tag(:delivery_date, @selected_date) %>
-
           <table class="table table-hover">
             <thead>
                 <tr>
@@ -79,16 +74,15 @@
                   <th>Address</th>
                   <th>Purchase Order</th>
                   <th>Volume</th>
-
                   <th>Client Name</th>
                   <th>Type</th>
                 </tr>
             </thead>
             <tbody>
-                <%= render partial: "orders", locals: {orders: @unassigned_orders} %>
-                <%= render partial: "orders", locals: {orders: @morning_orders} %>
-                <%= render partial: "orders", locals: {orders: @afternoon_orders} %>
-                <%= render partial: "orders", locals: {orders: @evening_orders} %>
+                <%= render partial: "orders_dispatching_rows", locals: {orders: @unassigned_orders} %>
+                <%= render partial: "orders_dispatching_rows", locals: {orders: @morning_orders} %>
+                <%= render partial: "orders_dispatching_rows", locals: {orders: @afternoon_orders} %>
+                <%= render partial: "orders_dispatching_rows", locals: {orders: @evening_orders} %>
             </tbody>
           </table>
       <% end %>

@@ -1,8 +1,15 @@
 class Order < ActiveRecord::Base
-  belongs_to :originator
   belongs_to :client
   belongs_to :address
   belongs_to :load
+
+  validates :purchase_order_number, numericality: {only_integer: true, message: 'Purchase Order Number should be specified as integer number'}, presence: {message: "Purchase Order Number couldn't be blank"}
+  validates :unit_quantity, numericality: {only_integer: true, message: 'Units Quantity should be specified as integer number'}, presence: {message: "Units quantity couldn't be blank"}
+  validates :volume, numericality: {message: 'Volume should be presented as integer of float value'}, presence: {message: "Volume couldn't be blank"}
+  validates :desired_date, presence: {message: "Desired Delivery Date couldn't be blank"}
+  validates :unit_type, presence: {message: 'Unit type should be specified'}
+  validates :client, presence: {message: "Client haven't been created for order"}
+  validates :address, presence: {message: "Address haven't been created for order"}
 
   ORDER_TYPE_DELIVERY = "Delivery"
   ORDER_TYPE_RETURN = "Return"
@@ -20,13 +27,12 @@ class Order < ActiveRecord::Base
     order.unit_quantity = unit_quantity
     order.unit_type = unit_type
 
-    if Load.find_by(delivery_date: desired_date).nil?
-      loads = Load.create_loads_for_date(desired_date)
-    else
-      loads = Load.get_loads_for_date(desired_date)
-    end
-
     order.save
+    return order
+  end
+
+  def self.orders_by_date(date)
+    Order.where(desired_date: date)
   end
 
   def cargo_description

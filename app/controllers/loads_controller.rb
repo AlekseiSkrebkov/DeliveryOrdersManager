@@ -1,7 +1,6 @@
 class LoadsController < ApplicationController
 
   def index
-    #ToDo Add filter by status and driver
     @load_dates = Load.select(:delivery_date).order(:delivery_date).distinct
 
     @date = params[:date]
@@ -9,11 +8,8 @@ class LoadsController < ApplicationController
       @date = @load_dates[0].delivery_date.to_s
     end
 
-    driver_id = params[:driver]
-    @driver = nil
-    if !driver_id.nil?
-      @driver = User.find(driver_id)
-    end
+    driver_id = session[:user]
+    @driver = User.find(driver_id)
 
     loads_by_driver = Load.where(user: @driver, delivery_date: @date)
 
@@ -21,21 +17,19 @@ class LoadsController < ApplicationController
     loads_by_driver.each do |load|
       @orders_by_load[load] = Order.where(load: load).order(:stop_num)
     end
-
-    logger.debug "orders_by_load=" + @orders_by_load.to_s
-
-    respond_to do |format|
-      format.html
-      format.csv {
-        send_data to_csv(@orders_by_load), filename: "Routing list for " + @date + ".csv"
-        #redirect_to load_path(@load)
-      }
-    end
   end
 
   def show
-    @load = Load.find(params[:id])
-    @orders = Order.where(load: @load)
+    load = Load.find(params[:id])
+    @orders_by_load = Hash.new
+    @orders_by_load[load] = Order.where(load: load).order(:stop_num)
+    respond_to do |format|
+      format.html
+      format.csv {
+        send_data to_csv(@orders_by_load), filename: 'Routing_List_' + load.delivery_date.to_s + '_' + load.name + '.csv'
+        #redirect_to load_path(@load)
+      }
+    end
   end
 
   def routing
@@ -52,8 +46,6 @@ class LoadsController < ApplicationController
 
     errors = []
     address_to_stopnum_map = load.address_to_stopnum_map
-    logger.debug "stop_num_to_address_map: " + address_to_stopnum_map.to_s
-
     duplications = Set.new
 
     orders_in_load.each do |order|
@@ -78,12 +70,7 @@ class LoadsController < ApplicationController
             next
           end
         end
-
-        logger.debug "specified_stop_num"
-        logger.debug "address_to_stopnum_map.has_value?(specified_stop_num)= " + address_to_stopnum_map.has_value?(specified_stop_num).to_s
-        logger.debug "(address_to_stopnum_map.key(specified_stop_num) != address_id)= " + (address_to_stopnum_map.key(specified_stop_num) != address_id).to_s
-
-        #Checking for duplications
+       #Checking for duplications
         if address_to_stopnum_map.has_value?(specified_stop_num) && (address_to_stopnum_map.key(specified_stop_num) != address_id)
           duplications.add(specified_stop_num)
           #stop_nums.push(order_stop_num)

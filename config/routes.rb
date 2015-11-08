@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   post 'orders/upload_orders' => 'orders#upload_orders'
   post 'orders/set_load' => 'orders#set_load'
   post 'loads/:id/set_route' => 'loads#set_route'
+
   get 'loads/:id/routing' => 'loads#routing', :as => 'load_routing'
   resources :orders
   resources :loads

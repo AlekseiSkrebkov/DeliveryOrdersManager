@@ -13,7 +13,7 @@
         <td>
           <div align="center">
             <%= link_to "<span class=\"glyphicon glyphicon-edit\"></span>".html_safe, edit_order_path(order) %>
-            <%= link_to "<span class=\"glyphicon glyphicon-remove\"></span>".html_safe, order_path(order), method: :delete, date: {confirm: 'Are you sure?'} %>
+            <%= link_to "<span class=\"glyphicon glyphicon-remove\"></span>".html_safe, order_path(order), method: :delete, data: {confirm: 'Are you sure?'} %>
           </div>
         </td>
         <td><%= order.id %></td>

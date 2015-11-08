@@ -1,60 +1,119 @@
-<div class="form-group">
-  <%= label_tag :desired_date, 'Desired Delivery Date:', class: "control-label col-sm-2"%>
-  <div class="col-sm-3">
-    <%= date_field_tag :desired_date, @order.desired_date, class: "form-control" %>
+<div class="row">
+  <div class="col-sm-6">
+    <div class="panel panel-default">
+
+      <div class="panel-heading"><b>Delivery Information:</b></div>
+      <div class="panel-body">
+        <div class="form-group">
+          <%= label_tag :desired_date, 'Desired Delivery Date:', class: "control-label col-sm-5"%>
+          <div class="col-sm-7">
+            <%= date_field_tag :desired_date, @order.desired_date, class: "form-control" %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :desired_shift, 'Desired Shift:', class: "control-label col-sm-5" %>
+          <div class="col-sm-7">
+            <%= select_tag :desired_shift, options_for_select([ "M", "N", "E" ], @order.desired_shift), include_blank: true, class: "form-control" %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :purchase_order_number, 'Purchase Order:', class: "control-label col-sm-5" %>
+          <div class="col-sm-7">
+            <%= text_field_tag :purchase_order_number, @order.purchase_order_number, class: "form-control" %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :order_type, 'Order Type:', class: "control-label col-sm-5" %>
+          <div class="col-sm-7">
+            <%= select_tag :order_type, options_for_select([ "Delivery", "Return" ], @order.order_type), class: "form-control" %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :volume, 'Volume:', class: "control-label col-sm-5" %>
+          <div class="col-sm-7">
+            <%= text_field_tag :volume, @order.volume, class: "form-control" %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :unit_quantity, 'Units Quantity:', class: "control-label col-sm-5" %>
+          <div class="col-sm-7">
+            <%= text_field_tag :unit_quantity, @order.unit_quantity, class: "form-control" %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :unit_type, 'Units Type:', class: "control-label col-sm-5" %>
+          <div class="col-sm-7">
+            <%= text_field_tag :unit_type, (@order.unit_type.nil? ? "box" : @order.unit_type), class: "form-control" %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :mode, 'Delivery mode:', class: "control-label col-sm-5" %>
+          <div class="col-sm-7">
+            <%= text_field_tag :mode, @order.mode, class: "form-control" %>
+          </div>
+        </div>
+      </div>
+      <br/><br/>
+    </div>
+
   </div>
-</div>
-<div class="form-group">
-  <%= label_tag :desired_shift, 'Desired Shift:', class: "control-label col-sm-2" %>
-  <div class="col-sm-3">
-    <%= select_tag :desired_shift, options_for_select([ "M", "N", "E" ], @order.desired_shift), include_blank: true, class: "form-control" %>
+
+  <div class="col-sm-6">
+
+    <div class="panel panel-default">
+      <div class="panel-heading"><b>Destination Address:</b></div>
+      <div class="panel-body">
+        <div class="form-group">
+          <%= label_tag :country, 'Coutry:', class: "control-label col-sm-4" %>
+          <div class="col-sm-8">
+            <%= text_field_tag :country, @address.country, class: "form-control" %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :state, 'State:', class: "control-label col-sm-4" %>
+          <div class="col-sm-8">
+            <%= text_field_tag :state, @address.state, class: "form-control" %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :city, 'City:', class: "control-label col-sm-4" %>
+          <div class="col-sm-8">
+            <%= text_field_tag :city, @address.city, class: "form-control" %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :raw_line, 'Address:', class: "control-label col-sm-4" %>
+          <div class="col-sm-8">
+            <%= text_field_tag :raw_line, @address.raw_line, class: "form-control" %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :zipcode, 'ZIP code:', class: "control-label col-sm-4" %>
+          <div class="col-sm-8">
+            <%= text_field_tag :zipcode, @address.zipcode, class: "form-control" %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading"><b>Client Information:</b></div>
+      <div class="panel-body">
+        <div class="form-group">
+          <%= label_tag :client_name, 'Client Name:', class: "control-label col-sm-4" %>
+          <div class="col-sm-8">
+            <%= text_field_tag :client_name, @client.name, class: "form-control" %>
+          </div>
+        </div>
+        <div class="form-group">
+          <%= label_tag :client_phone, 'Client Phone:', class: "control-label col-sm-4" %>
+          <div class="col-sm-8">
+            <%= text_field_tag :client_phone, @client.phone, class: "form-control" %>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+
 </div>
-<div class="form-group">
-  <%= label_tag :purchase_order_number, 'Purchase Order:', class: "control-label col-sm-2" %>
-  <div class="col-sm-3">
-    <%= text_field_tag :purchase_order_number, @order.purchase_order_number, class: "form-control" %>
-  </div>
-</div>
-<div class="form-group">
-  <%= label_tag :order_type, 'Order Type:', class: "control-label col-sm-2" %>
-  <div class="col-sm-3">
-    <%= select_tag :order_type, options_for_select([ "Delivery", "Return" ], @order.order_type), class: "form-control" %>
-  </div>
-</div>
-<div class="form-group">
-  <%= label_tag :client, 'Client:', class: "control-label col-sm-2" %>
-  <div class="col-sm-3">
-    <%= select_tag :client, options_from_collection_for_select(@clients, "id", "name", @order.client) , class: "form-control" %>
-  </div>
-</div>
-<div class="form-group">
-  <%= label_tag :address, 'Address:', class: "control-label col-sm-2" %>
-  <div class="col-sm-3">
-    <%= select_tag :address, options_from_collection_for_select(@addresses, "id", "raw_line", @order.address) , class: "form-control" %>
-  </div>
-</div>
-<div class="form-group">
-  <%= label_tag :volume, 'Volume:', class: "control-label col-sm-2" %>
-  <div class="col-sm-3">
-    <%= text_field_tag :volume, @order.volume, class: "form-control" %>
-  </div>
-</div>
-<div class="form-group">
-  <%= label_tag :unit_quantity, 'Units Quantity:', class: "control-label col-sm-2" %>
-  <div class="col-sm-3">
-    <%= text_field_tag :unit_quantity, @order.unit_quantity, class: "form-control" %>
-  </div>
-</div>
-<div class="form-group">
-  <%= label_tag :unit_type, 'Units Type:', class: "control-label col-sm-2" %>
-  <div class="col-sm-3">
-    <%= text_field_tag :unit_type, (@order.unit_type.nil? ? "box" : @order.unit_type), class: "form-control" %>
-  </div>
-</div>
-<div class="form-group">
-  <%= label_tag :mode, 'Units Type:', class: "control-label col-sm-2" %>
-  <div class="col-sm-3">
-    <%= text_field_tag :mode, @order.mode, class: "form-control" %>
-  </div>
-</div>
+
