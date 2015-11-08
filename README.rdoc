@@ -1,28 +1,11 @@
-== README
+Application was implemented using Rails v4.1.8, Ruby v2.0.0
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+To get started on your localhost:
+* navigate to {application folder}/bin and start command line
+* create database schema using 'rake db:setup'
+* start web server using 'rails server'
+* navigate to localhost:3000 in your browser
 
-Things you may want to cover:
+Enjoy!
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+Internet connection is required due to linkage with remote css
