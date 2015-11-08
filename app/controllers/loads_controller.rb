@@ -4,7 +4,7 @@ class LoadsController < ApplicationController
     @load_dates = Load.select(:delivery_date).order(:delivery_date).distinct
 
     @date = params[:date]
-    if (@date.nil? || @date.size ==0)
+    if @date.nil? && !@load_dates.empty?
       @date = @load_dates[0].delivery_date.to_s
     end
 

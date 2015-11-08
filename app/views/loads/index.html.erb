@@ -1,16 +1,27 @@
+<%
+   loads_exist = (@load_dates.count > 0)
+%>
 <% content_for :navigation do %>
-    <h3>Delivery Dates:</h3>
-    <div class="list-group" align="center">
-      <% @load_dates.each do |load|
-        delivery_date = load.delivery_date
-      %>
-          <%= link_to delivery_date, loads_path(date: delivery_date), class: (delivery_date.to_s == @date ? "list-group-item active" : "list-group-item") %>
-      <% end %>
-    </div>
+    <% if loads_exist %>
+        <h3>Delivery Dates:</h3>
+        <div class="list-group" align="center">
+          <% @load_dates.each do |load|
+            delivery_date = load.delivery_date
+          %>
+              <%= link_to delivery_date, loads_path(date: delivery_date), class: (delivery_date.to_s == @date ? "list-group-item active" : "list-group-item") %>
+          <% end %>
+        </div>
+    <% end %>
 <% end %>
 
-<h3> Orders distribution across loads on: <%= @date %> </h3>
+<% if loads_exist %>
+    <h3> Orders distribution across loads on: <%= @date %> </h3>
 
-<% @orders_by_load.each do |load, orders| %>
-  <%= render partial: "load", locals: {load: load, orders: orders} %>
+    <% @orders_by_load.each do |load, orders| %>
+      <%= render partial: "load", locals: {load: load, orders: orders} %>
+    <% end %>
+<% else %>
+    <h4>
+      No loads exist in the system
+    </h4>
 <% end %>
