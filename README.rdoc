@@ -6,6 +6,8 @@ To get started on your localhost:
 * start web server using 'rails server'
 * navigate to localhost:3000 in your browser
 
+Short user guide is available by the link: https://docs.google.com/document/d/1x6YUpWC1rUSJMS1XYFOFFVqTirqu3l4DndtnzeNRLz8/edit?usp=sharing
+
 Enjoy!
 
 Internet connection is required due to linkage with remote css
