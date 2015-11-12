@@ -18,19 +18,19 @@ class OrdersController < ApplicationController
     end
 
     if !@selected_date.nil?
-      #Retrieving Loads
-      @loads = Load.get_loads_for_date(@selected_date)
-      @morning_load = @loads[Load::MORNING_LOAD]
-      @afternoon_load = @loads[Load::AFTERNOON_LOAD]
-      @evening_load = @loads[Load::EVENING_LOAD]
 
       #Retrieve Orders by Load
       @unassigned_orders = Order.joins(:address).where("desired_date = ? and load_id is null", @selected_date).order("addresses.state, addresses.city")
-      @morning_orders = Order.joins(:address).where(orders: {desired_date: @selected_date, load_id: @morning_load}).order("addresses.state, addresses.city")
-      @afternoon_orders = Order.joins(:address).where(orders: {desired_date: @selected_date, load_id: @afternoon_load}).order("addresses.state, addresses.city")
-      @evening_orders = Order.joins(:address).where(orders: {desired_date: @selected_date, load_id: @evening_load}).order("addresses.state, addresses.city")
-    end
 
+      @morning_load  = Load.retrieve_by_date_and_shift(@selected_date, Load::MORNING_LOAD)
+      @morning_orders = (@morning_load.fake? ? Array.new : Order.get_orders_by_date_and_load(@selected_date, @morning_load))
+
+      @afternoon_load = Load.retrieve_by_date_and_shift(@selected_date, Load::AFTERNOON_LOAD)
+      @afternoon_orders = (@afternoon_load.fake? ? Array.new : Order.get_orders_by_date_and_load(@selected_date, @afternoon_load))
+
+      @evening_load = Load.retrieve_by_date_and_shift(@selected_date, Load::EVENING_LOAD)
+      @evening_orders = (@evening_load.fake? ? Array.new : Order.get_orders_by_date_and_load(@selected_date, @evening_load))
+    end
   end
 
   def new
@@ -50,9 +50,6 @@ class OrdersController < ApplicationController
     @errors.concat(get_error_messages(@order))
 
     if @order.valid?
-      if (!@order.desired_date.nil? && !Load.exist_for_date?(@order.desired_date))
-        Load.create_loads_for_date(@order.desired_date)
-      end
       redirect_to orders_path(selected_date: @order.desired_date)
     else
       @address = order_params[:address]
@@ -131,7 +128,11 @@ class OrdersController < ApplicationController
         orders.each do |order_id|
           order = Order.find(order_id)
           if load.enough_volume?(order.volume)
+            previous_load = order.load
             order.update(load: load)
+            if !previous_load.nil?
+              previous_load.destroy_if_empty
+            end
             i += 1
           else
             error_message = "Available volume is not enough to put following orders into load for " + load.name + ": "
@@ -186,7 +187,7 @@ class OrdersController < ApplicationController
   def read_order(data)
     validation_errors = []
     order = Order.new
-    if data['origin_name'] = COMPANY_NAME
+    if data['origin_name'] == COMPANY_NAME
       order.order_type = ORDER_TYPE_DELIVERY
       address = Address.get_address(data['destination_country'],
                                     data['destination_state'],
@@ -223,13 +224,9 @@ class OrdersController < ApplicationController
     order.unit_type = data['handling_unit_type']
 
     order.save
-    if (!order.desired_date.nil? && !Load.exist_for_date?(order.desired_date))
-      Load.create_loads_for_date(order.desired_date)
-    end
+
     if order.invalid?
       validation_errors.concat(get_error_messages(order))
-    else
-
     end
 
     order_errors = Hash.new

@@ -39,4 +39,8 @@ class Order < ActiveRecord::Base
     ActionController::Base.helpers.pluralize(self.unit_quantity, self.unit_type)
   end
 
+  def self.get_orders_by_date_and_load(date, load)
+    Order.joins(:address).where(orders: {desired_date: date, load_id: load}).order("addresses.state, addresses.city")
+  end
+
 end

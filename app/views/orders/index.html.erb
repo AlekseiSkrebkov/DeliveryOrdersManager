@@ -35,9 +35,9 @@
           <thead>
             <tr>
                 <th>Time frame (<span class="glyphicon glyphicon-info-sign"></span>click to edit route):</th>
-                <th><%= link_to @morning_load.name, load_routing_path(@morning_load) %></th>
-                <th><%= link_to @afternoon_load.name, load_routing_path(@afternoon_load) %></th>
-                <th><%= link_to @evening_load.name, load_routing_path(@evening_load) %></th>
+                <th><%= @morning_load.id.nil? ? @morning_load.name : (link_to @morning_load.name, load_routing_path(@morning_load)) %></th>
+                <th><%= @afternoon_load.id.nil? ? @afternoon_load.name : (link_to @afternoon_load.name, load_routing_path(@afternoon_load)) %></th>
+                <th><%= @evening_load.id.nil? ? @evening_load.name : (link_to @evening_load.name, load_routing_path(@evening_load)) %></th>
               </tr>
           </thead>
           <tbody>

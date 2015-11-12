@@ -5,6 +5,12 @@ class Load < ActiveRecord::Base
   AFTERNOON_LOAD = "N"
   EVENING_LOAD = "E"
 
+  DELIVERY_TYMES = {
+      MORNING_LOAD => '8am - 12am',
+      AFTERNOON_LOAD => '12am - 6pm',
+      EVENING_LOAD => '6pm - 10pm'
+  }
+
   INITIAL_DATE = Date.new(2014,1,1)
   DRIVER_1 = 2
   DRIVER_2 = 3
@@ -21,16 +27,6 @@ class Load < ActiveRecord::Base
 
   TOTAL_VOLUME = 1400
 
-  def self.create_loads_for_date(date)
-    if date.nil?
-      return
-    end
-    loads= {MORNING_LOAD => Load.create(delivery_date: date, delivery_shift: MORNING_LOAD, name: ("8am - 12am"), user: User.find(define_driver(date, MORNING_LOAD))),
-            AFTERNOON_LOAD => Load.create(delivery_date: date, delivery_shift: AFTERNOON_LOAD, name: ("12am - 6pm"), user: User.find(define_driver(date, AFTERNOON_LOAD)) ),
-            EVENING_LOAD => Load.create(delivery_date: date, delivery_shift: EVENING_LOAD, name: ("6pm - 10pm"), user: User.find(define_driver(date, EVENING_LOAD)) )
-    }
-  end
-
   def self.exist_for_date? (date)
     !Load.find_by(delivery_date: date).nil?
   end
@@ -38,16 +34,25 @@ class Load < ActiveRecord::Base
   def self.get_by_date_and_load(date, shift)
     load = Load.find_by(delivery_date: date, delivery_shift: shift)
     if load.nil?
-      load = Load.create(delivery_date: date, delivery_shift: shift, name: date + ' ' + shift)
+      load = Load.create(delivery_date: date, delivery_shift: shift, name: get_load_name(date, shift), user: define_driver(date, shift))
     end
     return load
   end
 
-  def self.get_loads_for_date(date)
-    loads= {MORNING_LOAD => Load.find_by(delivery_date: date, delivery_shift: MORNING_LOAD),
-            AFTERNOON_LOAD => Load.find_by(delivery_date: date, delivery_shift: AFTERNOON_LOAD),
-            EVENING_LOAD => Load.find_by(delivery_date: date, delivery_shift: EVENING_LOAD)
-    }
+  def fake?
+    id.nil?
+  end
+
+  def self.retrieve_by_date_and_shift(date, shift)
+    load = Load.find_by(delivery_date: date, delivery_shift: shift)
+    if load.nil?
+      load = Load.new(delivery_date: date, delivery_shift: shift, name: get_load_name(date, shift))
+    end
+    return load
+  end
+
+  def self.get_load_name(date, shift)
+    DELIVERY_TYMES[shift]
   end
 
   def enough_volume?(required_volume)
@@ -55,6 +60,9 @@ class Load < ActiveRecord::Base
   end
 
   def available_volume
+    if fake?
+      return TOTAL_VOLUME
+    end
     sum = Order.where("load_id = ? and order_type = 'Delivery'", id).sum("volume")
     available_volume = (TOTAL_VOLUME - sum).round(2)
 
@@ -81,6 +89,9 @@ class Load < ActiveRecord::Base
   end
 
   def number_of_stops
+    if fake?
+      return 0
+    end
     result = Order.joins(:address).select("address_id").where(load: self).group("address_id, order_type")
     return result.as_json.size
   end
@@ -89,19 +100,26 @@ class Load < ActiveRecord::Base
     Order.where(load: self).order("order_type")
   end
 
+  def destroy_if_empty
+    if !Order.exists?(load:self)
+      self.destroy
+    end
+  end
+
 private
   def self.define_driver(date, shift)
     if date.nil?
       return
     end
-    delta = date - INITIAL_DATE
+    target_date = Date.strptime(date, '%Y-%m-%d')
+    delta = target_date - INITIAL_DATE
 
     logger.debug "delta between dates=" + delta.to_s
 
     if delta % 2 == 1
-      return ODD_DAYS_SCHEDULE[shift]
+      return User.find(ODD_DAYS_SCHEDULE[shift])
     else
-      return EVEN_DAYS_SCHEDULE[shift]
+      return User.find(EVEN_DAYS_SCHEDULE[shift])
     end
   end
 

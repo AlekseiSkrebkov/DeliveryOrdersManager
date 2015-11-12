@@ -5,7 +5,7 @@ class Address < ActiveRecord::Base
   validates :state, presence: {message: "State couldn't be blank"}
   validates :country, presence: {message: "Country couldn't be blank"}
 
-  def Address.get_address(country_name, state_name, city_name, zipcode, raw_line)
+  def self.get_address(country_name, state_name, city_name, zipcode, raw_line)
     address = Address.find_by(zipcode: zipcode, raw_line: raw_line)
     if address.nil?
       address = Address.create(zipcode: zipcode, raw_line: raw_line, city: city_name, state: state_name, country: country_name)

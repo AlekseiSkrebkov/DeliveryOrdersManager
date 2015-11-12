@@ -25,7 +25,7 @@ class AuthController < ApplicationController
         @errors.push('Password is empty')
       end
 
-      user = User.find_by(login: login, password: password)
+      user = User.find_by(login: login, password: User.encrypt_password(password))
     end
 
     if user.nil?

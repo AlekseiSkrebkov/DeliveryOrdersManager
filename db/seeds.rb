@@ -1,8 +1,12 @@
+require 'digest'
+
+default_pwd = User.encrypt_password('123')
+
 User.create(
         [
-            {login: 'dispatcher', password: '123', user_type: 'dispatcher'},
-            {login: 'driver1', password: '123', user_type: 'driver'},
-            {login: 'driver2', password: '123', user_type: 'driver'}
+            {login: 'dispatcher', password: default_pwd, user_type: 'dispatcher'},
+            {login: 'driver1', password: default_pwd, user_type: 'driver'},
+            {login: 'driver2', password: default_pwd, user_type: 'driver'}
         ]
 )
 

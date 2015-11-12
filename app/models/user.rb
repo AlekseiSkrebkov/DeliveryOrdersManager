@@ -9,4 +9,8 @@ class User < ActiveRecord::Base
   def dispatcher?
     user_type == USER_DISPATCHER
   end
+
+  def self.encrypt_password(password)
+    Digest::SHA2.hexdigest(password)
+  end
 end

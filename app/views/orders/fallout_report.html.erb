@@ -24,20 +24,23 @@
       <% @failed_rows.each do |order, errors|%>
           <tr>
             <td>
-              <p><b>Desired delivery date: </b> <%=order.desired_date%><br/>
-              <b>Desired delivery shift: </b> <%=order.desired_shift%> <br/>
-              <b>Purchase Order Number: </b><%=order.purchase_order_number%><br/>
-              <b>Client Name: </b><%=order.client.name%><br/>
-              <b>Client Phone: </b><%=order.client.phone%><br/>
-              <b>Destination Country: </b><%=order.address.country%><br/>
-              <b>Destination State:</b> <%=order.address.state%><br/>
-              <b>Destination City: </b><%=order.address.city%><br/>
-              <b>Destination Raw: </b><%=order.address.raw_line%><br/>
-              <b>Destination Zip code: </b><%=order.address.zipcode %><br/>
-              <b>Mode: </b><%=order.mode%><br/>
-              <b>Volume: </b><%=order.volume%><br/>
-              <b>Units Quantity: </b><%=order.unit_quantity%><br/>
-              <b>Units Type: </b><%=order.unit_type%></p>
+              <p>
+                  <b>Desired delivery date: </b> <%=order.desired_date%><br/>
+                  <b>Desired delivery shift: </b> <%=order.desired_shift%> <br/>
+                  <b>Purchase Order Number: </b><%=order.purchase_order_number%><br/>
+                  <b>Client Name: </b><%=order.client.name%><br/>
+                  <b>Client Phone: </b><%=order.client.phone%><br/>
+                  <b>Destination Country: </b><%=order.address.country%><br/>
+                  <b>Destination State:</b> <%=order.address.state%><br/>
+                  <b>Destination City: </b><%=order.address.city%><br/>
+                  <b>Destination Raw: </b><%=order.address.raw_line%><br/>
+                  <b>Destination Zip code: </b><%=order.address.zipcode %><br/>
+                  <b>Mode: </b><%=order.mode%><br/>
+                  <b>Volume: </b><%=order.volume%><br/>
+                  <b>Units Quantity: </b><%=order.unit_quantity%><br/>
+                  <b>Units Type: </b><%=order.unit_type%>
+                  <b>Order Type: </b><%=order.order_type%>
+              </p>
             </td>
             <td>
               <ul>
@@ -51,5 +54,3 @@
   </tbody>
 
 </table>
-
-<%= link_to orders_path %>

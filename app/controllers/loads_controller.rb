@@ -1,15 +1,15 @@
 class LoadsController < ApplicationController
 
   def index
-    @load_dates = Load.select(:delivery_date).order(:delivery_date).distinct
+    driver_id = session[:user]
+    @driver = User.find(driver_id)
+
+    @load_dates = Load.select(:delivery_date).where(user: @driver).order(:delivery_date).distinct
 
     @date = params[:date]
     if @date.nil? && !@load_dates.empty?
       @date = @load_dates[0].delivery_date.to_s
     end
-
-    driver_id = session[:user]
-    @driver = User.find(driver_id)
 
     loads_by_driver = Load.where(user: @driver, delivery_date: @date)
 
@@ -98,10 +98,10 @@ private
 
     require 'csv'
     CSV.generate do |csv|
-      csv << ['Date/Time', 'Stop #', 'Address', 'Purchase Order#', 'Description','Client Name', 'Client Phone#']
+      csv << ['Date/Time', 'Stop #', 'Address', 'Order Type', 'Purchase Order#', 'Description','Client Name', 'Client Phone#']
       orders_by_load.each do |load, orders|
         orders.each do |order|
-          csv << [load.delivery_date.to_s + ' ' + load.name, order.stop_num.to_s, order.address.full_address, order.purchase_order_number, order.cargo_description, order.client.name, order.client.phone]
+          csv << [load.delivery_date.to_s + ' ' + load.name, order.stop_num.to_s, order.address.full_address, order.order_type, order.purchase_order_number, order.cargo_description, order.client.name, order.client.phone]
         end
       end
     end
